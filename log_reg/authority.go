@@ -28,10 +28,10 @@ type Authority struct {
 	delta     float64
 	scaling   int64
 	nrWorkers int
-	keys      map[int]int
+	keys      map[string]int
 }
 
-func NewAuthority(vecL int, numC int, bX, bY, bN *big.Int, e, d float64, scal int64, keys map[int]int, workers int, n bool) (*Authority, time.Duration) {
+func NewAuthority(vecL int, numC int, bX, bY, bN *big.Int, e, d float64, scal int64, keys map[string]int, workers int, n bool) (*Authority, time.Duration) {
 	a := &Authority{
 		vecLen:    vecL,
 		numClient: numC,
@@ -74,7 +74,7 @@ func computeNoise(theta []float64, alpha, b, scaling, eps, del float64) []float6
 	n := make([]float64, len(theta))
 
 	infSen := computeInfSen(theta, alpha, b)
-	fmt.Printf("infSen: %v\n", infSen)
+	//	fmt.Printf("infSen: %v\n", infSen)
 	zeroSen := compute0Sen(theta)
 
 	// //noise via gauss
@@ -84,7 +84,6 @@ func computeNoise(theta []float64, alpha, b, scaling, eps, del float64) []float6
 		n[j] = gauss.AddNoiseFloat64(0.0, zeroSen, infSen, eps, del)
 
 	}
-	fmt.Printf("n: %v\n", n)
 
 	//fmt.Printf("n: %v\n", n)
 
@@ -128,7 +127,7 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 	a0 := 0.5
 
 	//2^3m
-	pow23m := int(math.Pow(2, 3*float64(m)))
+	pow23m := new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(m)), nil) // 	 int(math.Pow(2, 3*float64(m)))
 
 	//bias term, (theta[m+1])
 	y[m] = data.NewConstantMatrix(a.numClient, a.vecLen, big.NewInt(0))
@@ -142,17 +141,19 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 		//terms of degree 1
 		//coeff for x[m+1] -- lookup index in keys
 		yH = alpha / float64(a.numClient)
-		y[m][i][a.keys[pow23m+m+1]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+		y[m][i][a.keys[new(big.Int).Add(pow23m, big.NewInt(int64(m+1))).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+		//y[m][i][a.keys[pow23m+m+1]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 		for k := 0; k < m; k++ {
 			//x_i[k]  -- lookup index in keys for 8^i
 			yH = (alpha * theta[k] / float64(a.numClient)) * (a1 - 3*a3*math.Pow(theta[m], 2))
-			y[m][i][a.keys[int(math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			y[m][i][a.keys[new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(k)), nil).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			//y[m][i][a.keys[int(math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 		}
 
 		//multinomial coefficients
-		var generate func(m int, d int, index int, currentSum int, coeff float64, ks []int, key int)
-		generate = func(m int, d int, index int, currentSum int, coeff float64, ks []int, key int) {
+		var generate func(m int, d int, index int, currentSum int, coeff float64, ks []int, key *big.Int)
+		generate = func(m int, d int, index int, currentSum int, coeff float64, ks []int, key *big.Int) {
 			if index == m {
 				if currentSum == d {
 					// Calculate the  coefficient
@@ -162,8 +163,8 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 					}
 
 					//fmt.Printf("coeff: %v, exp: %v, key: %v\n", yH, ks, key)
-					y[m][i][a.keys[key]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-					key = 0
+					y[m][i][a.keys[key.String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+					key = big.NewInt(0)
 				}
 				return
 			}
@@ -171,7 +172,8 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 			for i := 0; i <= d-currentSum; i++ {
 				ks[index] = i
 				if i != 0 {
-					key += int(math.Pow(8, float64(index)))
+					key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(index)), nil))
+					//key += int(math.Pow(8, float64(index)))
 				}
 
 				generate(m, d, index+1, currentSum+i, coeff, ks, key)
@@ -181,12 +183,12 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 		//terms of degree 2
 		coeff := (alpha / float64(a.numClient)) * (-3 * a3 * theta[m])
 		ks := make([]int, m)
-		generate(m, 2, 0, 0, coeff, ks, 0)
+		generate(m, 2, 0, 0, coeff, ks, big.NewInt(0))
 
 		//terms of degree 3
 		coeff = (-1 * alpha * a3) / float64(a.numClient)
 		ks = make([]int, m)
-		generate(m, 3, 0, 0, coeff, ks, 0)
+		generate(m, 3, 0, 0, coeff, ks, big.NewInt(0))
 
 	}
 
@@ -201,21 +203,25 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 			//for i := 0; i < a.numClient; i++ {
 			//xi[j]
 			yH = alpha / float64(a.numClient) * (-1*a0 + a1*theta[m] - a3*math.Pow(theta[m], 3))
-			y[j][i][a.keys[int(math.Pow(8, float64(j)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			y[j][i][a.keys[new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			//y[j][i][a.keys[int(math.Pow(8, float64(j)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 			//xi[m+1]xi[j]
 			yH = alpha / float64(a.numClient)
-			y[j][i][a.keys[pow23m+j]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			y[j][i][a.keys[new(big.Int).Add(pow23m, big.NewInt(int64(j))).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+			//y[j][i][a.keys[pow23m+j]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 			//xi[k]xi[j]
 			for k := 0; k < m; k++ {
 				yH = alpha * theta[k] / float64(a.numClient) * (a1 - 3*a3*math.Pow(theta[m], 2))
-				y[j][i][a.keys[int(math.Pow(8, float64(j))+math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+
+				y[j][i][a.keys[new(big.Int).Add(new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil), new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(k)), nil)).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+				//y[j][i][a.keys[int(math.Pow(8, float64(j))+math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 			}
 
 			//multinomial coefficients
-			var generate func(m int, d int, index int, currentSum int, coeff float64, ks []int, key int)
-			generate = func(m int, d int, index int, currentSum int, coeff float64, ks []int, key int) {
+			var generate func(m int, d int, index int, currentSum int, coeff float64, ks []int, key *big.Int)
+			generate = func(m int, d int, index int, currentSum int, coeff float64, ks []int, key *big.Int) {
 				if index == m {
 					if currentSum == d {
 						// Calculate the coefficient
@@ -225,9 +231,10 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 						}
 
 						//fmt.Printf("coeff: %v, exp: %v, key: %v\n", yH, ks, key)
-						key += int(math.Pow(8, float64(j)))
-						y[j][i][a.keys[key]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-						key = 0
+						key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil))
+						//key += int(math.Pow(8, float64(j)))
+						y[j][i][a.keys[key.String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+						key = big.NewInt(0)
 					}
 					return
 				}
@@ -235,7 +242,8 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 				for i := 0; i <= d-currentSum; i++ {
 					ks[index] = i
 					if i != 0 {
-						key += int(math.Pow(8, float64(index)))
+						key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(index)), nil))
+						//key += int(math.Pow(8, float64(index)))
 					}
 
 					generate(m, d, index+1, currentSum+i, coeff, ks, key)
@@ -245,12 +253,12 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 			//degree 3
 			coeff := alpha / float64(a.numClient) * (-3 * a3 * theta[m])
 			ks := make([]int, m)
-			generate(m, 2, 0, 0, coeff, ks, 0)
+			generate(m, 2, 0, 0, coeff, ks, big.NewInt(0))
 
 			//degree 4
 			coeff = -1 * alpha * a3 / float64(a.numClient)
 			ks = make([]int, m)
-			generate(m, 3, 0, 0, coeff, ks, 0)
+			generate(m, 3, 0, 0, coeff, ks, big.NewInt(0))
 
 		}
 

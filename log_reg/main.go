@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/big"
 	"os"
+	"runtime"
 	"sort"
 	"strconv"
 	"sync"
@@ -41,7 +42,7 @@ func main() {
 	// attributes
 	rounds := 1
 	it := []int{50}
-	nrWorkers := 20
+	nrWorkers := runtime.NumCPU()
 
 	var epsilon []float64
 	for i := 0.00; i <= 5.0; i += 0.5 {
@@ -51,27 +52,28 @@ func main() {
 			epsilon = append(epsilon, i)
 		}
 	}
-	//epsilon = []float64{5.0}
+	epsilon = []float64{5.0}
 
-	filePrefix := "./datasets/training"
-	files := []string{"Nhanes.csv"} //, "PCS.csv", "UIS.csv", "nhanes3.csv"}
+	filePrefix := "./datasets/"                                   //training
+	files := []string{"syntetic100x31.csv", "syntetic500x31.csv"} //"syntetic189x3.csv", "trainingLBW.csv", "syntetic380x3.csv", "trainingPCS.csv", "syntetic575x3.csv", "trainingUIS.csv", "syntetic16427x4.csv", "trainingNhanes.csv"} //"LBW.csv", "PCS.csv", "UIS.csv", "Nhanes.csv"}
 
 	//batchsize and alpha in dependency of data set
-	alphaF := [][]float64{[]float64{0.1}} //, []float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}}
+	alphaF := [][]float64{[]float64{0.3}, []float64{0.3}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}} //, []float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}}
 
 	for _, iterations := range it {
 
-		fileRes := "resultsReviews" + fmt.Sprint(iterations) + ".txt"
+		fileRes := "resultsDegree1_Syntetic.txt" // + fmt.Sprint(iterations) + ".txt"
 
-		write(fileRes, "time in Nanosec\n", false)
-		write(fileRes, "eps = ", false)
-		write(fileRes, fmt.Sprintln(epsilon), true)
+		write(fileRes, "time in Nanosec\n", true)
+		//write(fileRes, "eps = ", true)
+		//write(fileRes, fmt.Sprintln(epsilon), true)
 
 		for fI, file := range files {
 			alphaS := alphaF[fI]
 
 			debug(fmt.Sprintf("****************file: %v**********************\n", file))
-			write(fileRes, fmt.Sprintf(file+"= [ "), true)
+			write(fileRes, fmt.Sprintf(file), true)
+			//write(fileRes, "= [ ", true)
 
 			// read data
 			file = filePrefix + file
@@ -97,7 +99,6 @@ func main() {
 						//setup scheme/authority
 						a, tSetupA := NewAuthority(m, n, boundX, boundY, boundN, eps, delta, int64(scaling), keys, nrWorkers, noisyB)
 						//debug("time Setup: " + tSetupA.String())
-						return
 
 						//setup clients/encrypt data
 						ct := make([]data.Vector, n)
@@ -116,6 +117,7 @@ func main() {
 
 									label := make([]byte, 16)
 									start := time.Now()
+
 									ct[i], err = client.Encrypt(dataPlain[i], label, a.getEncryptionKey(i))
 									timeEnc := time.Since(start)
 									if err != nil {
@@ -139,7 +141,7 @@ func main() {
 
 						tE := time.Since(startE)
 						UNUSED(tE)
-						//fmt.Printf("time Encryption total: %v\n", tE)
+						fmt.Printf("time Encryption total: %v\n", tE)
 
 						// setup evaluator
 						e := NewEvaluator(int(attr), n, scaling, ct, a, batchsize, eps, delta)
@@ -168,11 +170,12 @@ func main() {
 
 				}
 
-				write(fileRes, fmt.Sprintf("%v, ", max[1]), true)
+				//	write(fileRes, fmt.Sprintf("%v, ", max[1]), true)
 				fmt.Printf("-- max: %v\n", max)
 			}
 			debug(fmt.Sprintf("average time LogReg: %v\n", timeTotal))
-			write(fileRes, fmt.Sprintf("]\nav time: %v\n", timeTotal), true)
+			//write(fileRes, fmt.Sprintf("]\n"), true)
+			write(fileRes, fmt.Sprintf(" av time: %v\n", timeTotal), true)
 
 		}
 
@@ -231,7 +234,7 @@ func loadTestData(file string) [][]float64 {
 }
 
 // //
-func loadData(file string, scaling int) (float64, int, data.Matrix, map[int]int) {
+func loadData(file string, scaling int) (float64, int, data.Matrix, map[string]int) {
 
 	f, err := os.Open(file)
 	if err != nil {
@@ -245,11 +248,10 @@ func loadData(file string, scaling int) (float64, int, data.Matrix, map[int]int)
 		log.Fatal(err)
 	}
 
-	attr := len(records[0]) - 1
+	attr := int64(len(records[0]) - 1)
 
 	//blow up because of precomputed monomials (1/24 * m⁴ + 5/12 * m^3 + 35/24*m^2 + 37/12* m + 2)
 	m := int(math.Round(math.Pow(float64(attr), 4.0)/24 + math.Pow(float64(attr), 3.0)*5/12 + math.Pow(float64(attr), 2.0)*35/24 + float64(attr)*37/12 + 2.0))
-	l2 := math.Pow(2, float64(3*(attr)))
 
 	x := make([][]float64, len(records))
 	for i := 0; i < len(x); i++ {
@@ -262,35 +264,52 @@ func loadData(file string, scaling int) (float64, int, data.Matrix, map[int]int)
 
 	//create database as we want it, with kroenecker product
 	dataX := make(data.Matrix, len(records))
-	indices := make(map[int]int)
+	indices := make(map[string]int)
+
+	//blocklength for lookup table
+	b := big.NewInt(8)
+
+	var i, j, k, v int64
+
 	for r := 0; r < len(records); r++ {
 		dataX[r] = make(data.Vector, m)
-		lookup := map[int]float64{
-			0: 1,
+		lookup := map[string]float64{
+			"0": 1,
 		}
-		for i := 0; i < attr; i++ {
-			lookup[int(math.Pow(8, float64(i)))] = x[r][i]
-			for j := 0; j < attr; j++ {
-				lookup[int(math.Pow(8, float64(i))+math.Pow(8, float64(j)))] = x[r][i] * x[r][j]
-				for k := 0; k < attr; k++ {
-					lookup[int(math.Pow(8, float64(i))+math.Pow(8, float64(j))+math.Pow(8, float64(k)))] = x[r][i] * x[r][j] * x[r][k]
-					for v := 0; v < attr; v++ {
-						lookup[int(math.Pow(8, float64(i))+math.Pow(8, float64(j))+math.Pow(8, float64(k))+math.Pow(8, float64(v)))] = x[r][i] * x[r][j] * x[r][k] * x[r][v]
+
+		for i = 0; i < attr; i++ {
+
+			lookup[new(big.Int).Exp(b, big.NewInt(i), nil).String()] = x[r][i]
+
+			for j = 0; j < attr; j++ {
+				lookup[new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(i), nil), new(big.Int).Exp(b, big.NewInt(j), nil)).String()] = x[r][i] * x[r][j]
+
+				for k = 0; k < attr; k++ {
+
+					lookup[new(big.Int).Add(new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(i), nil), new(big.Int).Exp(b, big.NewInt(j), nil)), new(big.Int).Exp(b, big.NewInt(k), nil)).String()] = x[r][i] * x[r][j] * x[r][k]
+
+					for v = 0; v < attr; v++ {
+						lookup[new(big.Int).Add(new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(i), nil), new(big.Int).Exp(b, big.NewInt(j), nil)), new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(k), nil), new(big.Int).Exp(b, big.NewInt(v), nil))).String()] = x[r][i] * x[r][j] * x[r][k] * x[r][v]
+
 					}
 				}
 			}
 		}
+		i, j, k, v = 0, 0, 0, 0
 		//label
-		for i := 0; i < attr; i++ {
-			lookup[int(l2)+i] = x[r][i] * x[r][attr]
-		}
-		lookup[int(l2)+attr+1] = x[r][attr]
+		for i = 0; i < attr; i++ {
 
-		keys := make([]int, 0)
+			lookup[new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(attr), nil), big.NewInt(i)).String()] = x[r][i] * x[r][attr]
+		}
+
+		lookup[new(big.Int).Add(new(big.Int).Exp(b, big.NewInt(attr), nil), big.NewInt(attr+1)).String()] = x[r][attr]
+
+		keys := make([]string, 0)
 		for k, _ := range lookup {
 			keys = append(keys, k)
 		}
-		sort.Ints(keys)
+
+		sort.Strings(keys)
 
 		for i, k := range keys {
 			dataX[r][i] = big.NewInt(int64(math.Round(lookup[k] * float64(scaling))))

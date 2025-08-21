@@ -27,25 +27,28 @@ func main() {
 		scaling = 1000000.0
 	}
 
-	degree = 3
+	degree = 1 //3 or 1
 
 	rounds := 5
 
 	var epsilon []float64
-	for i := 0.00; i <= 8.0; i += 0.1 {
+	for i := 0.00; i <= 8.0; i += 0.2 {
 		if i == 0.0 {
 			epsilon = append(epsilon, 0.01)
 		} else {
 			epsilon = append(epsilon, i)
 		}
+		if i > 5.0 {
+			i += 0.5
+		}
 	}
 	//epsilon = []float64{1}
 
 	filePrefix := "../datasets/training"
-	files := []string{"LBW", "PCS", "UIS"}
-	it := []int{50}
-	//files := []string{"Nhanes"} //
-	//it := []int{50, 100, 150}
+	// files := []string{"LBW", "PCS", "UIS"}
+	// it := []int{50}
+	files := []string{"Nhanes"} //
+	it := []int{100, 150}       //50,
 	filePostfix := ".csv"
 
 	alphaF := map[string][]float64{
@@ -54,14 +57,14 @@ func main() {
 		"UIS":    []float64{0.06, 0.1, 0.3, 0.6, 0.9},
 		"Nhanes": []float64{0.1, 0.3, 0.6, 0.9},
 	}
-	fileRes := "results" + fmt.Sprint(scaling) + ".txt"
+	fileRes := "results" + fmt.Sprint(scaling) + "_ " + fmt.Sprint(degree) + ".txt"
 	batchsizesN := []int{0}
 	write(fileRes, "eps = ", true)
 	write(fileRes, fmt.Sprintln(epsilon), true)
 
 	for _, file := range files {
 		if file == "Nhanes" {
-			fileRes = "resultsNhanes" + fmt.Sprint(scaling) + ".txt"
+			fileRes = "resultsNhanes" + fmt.Sprint(scaling) + "_ " + fmt.Sprint(degree) + ".txt"
 		}
 		alphaS := alphaF[file]
 		// read data

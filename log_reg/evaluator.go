@@ -48,6 +48,7 @@ func (e Evaluator) trainLogReg(iterations int, alpha float64) ([]float64, time.D
 	//	fmt.Printf("theta: %v\n", theta)
 	eI := 0.0
 	for i := 0; i < iterations; i++ {
+
 		eps := e.epsilon*math.Pow(float64(i+1)/float64(iterations), 1.5) - e.epsilon*math.Pow(float64(i)/float64(iterations), 1.5)
 		eI += eps
 		del := e.delta / float64(iterations)
@@ -66,7 +67,7 @@ func (e Evaluator) trainLogReg(iterations int, alpha float64) ([]float64, time.D
 		dk, y := e.a.generateDK(theta, e.m, batch, eps, del, alpha)
 		//debug(fmt.Sprintf("time generating DK: %v \n ", time.Since(tDK)))
 
-		for j := 0; j < e.m+1; j++ { //todo change
+		for j := 0; j < e.m+1; j++ {
 			f := noisy.NewOTPRFFromParams(e.fe.Params)
 
 			res, err := f.Decrypt(e.cts, dk[j], y[j])
@@ -81,7 +82,7 @@ func (e Evaluator) trainLogReg(iterations int, alpha float64) ([]float64, time.D
 
 		}
 
-		fmt.Printf("theta: %v\n", theta)
+		//fmt.Printf("theta: %v\n", theta)
 
 		timeI := time.Since(startI)
 		if i%10 == 0 {
