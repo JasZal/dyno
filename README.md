@@ -61,14 +61,6 @@ bazel build ...
 cd ../..
 ```
 
-- clone and install the forked gofe library (https://github.com/JasZal/gofe)
-```bash
-git clone https://github.com/JasZal/gofe
-cd gofe
-go install github.com/JasZal/gofe/...
-cd ..
-```
-
 - clone the artifact (https://github.com/JasZal/dyno)
 ```bash
 git clone https://github.com/JasZal/dyno
@@ -76,6 +68,7 @@ cd differentially_private_functional_encryption
 ```
 
 now you can run the source code of the experiment by typing ```go run .``` in one of the two folders from the artifact (see below in subsection Experiments).
+
 
 
 
