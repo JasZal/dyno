@@ -31,6 +31,8 @@ type Authority struct {
 	keys      map[string]int
 }
 
+// Authority for the PPML training
+// generates decryption keys and keeps track of the privacy budget and computes noise
 func NewAuthority(vecL int, numC int, bX, bY, bN *big.Int, e, d float64, scal int64, keys map[string]int, workers int, n bool) (*Authority, time.Duration) {
 	a := &Authority{
 		vecLen:    vecL,
@@ -53,6 +55,7 @@ func NewAuthority(vecL int, numC int, bX, bY, bN *big.Int, e, d float64, scal in
 	return a, timeSetup
 }
 
+// computes inf senf for log reg
 func computeInfSen(theta []float64, alpha, n float64) float64 {
 	sumT := 0.0
 	for i := 0; i < len(theta); i++ {
@@ -66,27 +69,26 @@ func computeInfSen(theta []float64, alpha, n float64) float64 {
 
 }
 
+// computes zero sen. for log reg.
 func compute0Sen(theta []float64) int64 {
 	return int64(len(theta))
 }
 
+// computes gaussian noise to perturb decryption keys
 func computeNoise(theta []float64, alpha, b, scaling, eps, del float64) []float64 {
 	n := make([]float64, len(theta))
 
 	infSen := computeInfSen(theta, alpha, b)
-	//	fmt.Printf("infSen: %v\n", infSen)
 	zeroSen := compute0Sen(theta)
 
-	// //noise via gauss
-
+	//noise via gauss
 	gauss := noise.Gaussian()
 	for j := 0; j < len(n); j++ {
 		n[j] = gauss.AddNoiseFloat64(0.0, zeroSen, infSen, eps, del)
 
 	}
 
-	//fmt.Printf("n: %v\n", n)
-
+	//scale noise
 	for j := 0; j < len(n); j++ {
 		n[j] *= math.Pow(scaling, 2)
 
@@ -104,9 +106,8 @@ func computeNoise(theta []float64, alpha, b, scaling, eps, del float64) []float6
 	return n
 }
 
+// function to derive a functional key for vector y
 func (a *Authority) generateFunctionKey(y data.Matrix, noise *big.Int, label []byte) (*big.Int, error) {
-
-	// derive a functional key for vector y
 
 	key, err := a.fe.DeriveKey(a.msk, y, noise, label, a.nrWorkers)
 	if err != nil {
@@ -117,6 +118,10 @@ func (a *Authority) generateFunctionKey(y data.Matrix, noise *big.Int, label []b
 	return key, nil
 }
 
+// function that generates decryption key for the log reg update function with respect to given
+// model weights theta,
+// //privacy budget eps, del
+// learning rate alpha
 func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alpha float64) ([]*big.Int, []data.Matrix) {
 	dk := make([]*big.Int, m+1)
 	y := make([]data.Matrix, m+1)
@@ -142,13 +147,11 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 		//coeff for x[m+1] -- lookup index in keys
 		yH = alpha / float64(a.numClient)
 		y[m][i][a.keys[new(big.Int).Add(pow23m, big.NewInt(int64(m+1))).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-		//y[m][i][a.keys[pow23m+m+1]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 		for k := 0; k < m; k++ {
 			//x_i[k]  -- lookup index in keys for 8^i
 			yH = (alpha * theta[k] / float64(a.numClient)) * (a1 - 3*a3*math.Pow(theta[m], 2))
 			y[m][i][a.keys[new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(k)), nil).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-			//y[m][i][a.keys[int(math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 		}
 
 		//multinomial coefficients
@@ -173,7 +176,6 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 				ks[index] = i
 				if i != 0 {
 					key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(index)), nil))
-					//key += int(math.Pow(8, float64(index)))
 				}
 
 				generate(m, d, index+1, currentSum+i, coeff, ks, key)
@@ -200,23 +202,19 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 		y[j][0][0] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 		for _, i := range batch {
-			//for i := 0; i < a.numClient; i++ {
-			//xi[j]
 			yH = alpha / float64(a.numClient) * (-1*a0 + a1*theta[m] - a3*math.Pow(theta[m], 3))
 			y[j][i][a.keys[new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-			//y[j][i][a.keys[int(math.Pow(8, float64(j)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 			//xi[m+1]xi[j]
 			yH = alpha / float64(a.numClient)
 			y[j][i][a.keys[new(big.Int).Add(pow23m, big.NewInt(int64(j))).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-			//y[j][i][a.keys[pow23m+j]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 
 			//xi[k]xi[j]
 			for k := 0; k < m; k++ {
 				yH = alpha * theta[k] / float64(a.numClient) * (a1 - 3*a3*math.Pow(theta[m], 2))
 
 				y[j][i][a.keys[new(big.Int).Add(new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil), new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(k)), nil)).String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
-				//y[j][i][a.keys[int(math.Pow(8, float64(j))+math.Pow(8, float64(k)))]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
+
 			}
 
 			//multinomial coefficients
@@ -230,9 +228,7 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 							yH *= math.Pow(theta[k], float64(ks[k]))
 						}
 
-						//fmt.Printf("coeff: %v, exp: %v, key: %v\n", yH, ks, key)
 						key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(j)), nil))
-						//key += int(math.Pow(8, float64(j)))
 						y[j][i][a.keys[key.String()]] = big.NewInt(int64(math.Round(yH * float64(a.scaling))))
 						key = big.NewInt(0)
 					}
@@ -243,7 +239,7 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 					ks[index] = i
 					if i != 0 {
 						key = new(big.Int).Add(key, new(big.Int).Exp(big.NewInt(8), big.NewInt(int64(index)), nil))
-						//key += int(math.Pow(8, float64(index)))
+
 					}
 
 					generate(m, d, index+1, currentSum+i, coeff, ks, key)
@@ -268,7 +264,7 @@ func (a Authority) generateDK(theta []float64, m int, batch []int, eps, del, alp
 
 	label := make([]byte, 16)
 	noise := computeNoise(theta, alpha, float64(len(batch)), float64(a.scaling), eps, del)
-	for k := 0; k < m+1; k++ { //todochange
+	for k := 0; k < m+1; k++ {
 		dk[k], err = a.generateFunctionKey(y[k], big.NewInt(int64(noise[k])), label)
 	}
 	if err != nil {

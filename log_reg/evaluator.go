@@ -22,6 +22,7 @@ type Evaluator struct {
 	a         *Authority
 }
 
+// evaluater that performs training of a log reg
 func NewEvaluator(attr, numC, scaling int, cts []data.Vector, a *Authority, b int, eps, d float64) *Evaluator {
 	e := &Evaluator{
 		m:         attr,
@@ -38,17 +39,14 @@ func NewEvaluator(attr, numC, scaling int, cts []data.Vector, a *Authority, b in
 	return e
 }
 
+// log reg training
 func (e Evaluator) trainLogReg(iterations int, alpha float64) ([]float64, time.Duration, error) {
 	start := time.Now()
 	theta := make([]float64, e.m+1)
 
-	// for i := 0; i < len(theta); i++ {
-	// 	theta[i] = rand.Float64()
-	// }
-	//	fmt.Printf("theta: %v\n", theta)
 	eI := 0.0
 	for i := 0; i < iterations; i++ {
-
+		//using dynamically the privacy budget
 		eps := e.epsilon*math.Pow(float64(i+1)/float64(iterations), 1.5) - e.epsilon*math.Pow(float64(i)/float64(iterations), 1.5)
 		eI += eps
 		del := e.delta / float64(iterations)
@@ -85,9 +83,9 @@ func (e Evaluator) trainLogReg(iterations int, alpha float64) ([]float64, time.D
 		//fmt.Printf("theta: %v\n", theta)
 
 		timeI := time.Since(startI)
-		if i%10 == 0 {
-			fmt.Println("it ", i)
-		}
+		// if i%10 == 0 {
+		// 	fmt.Println("it ", i)
+		// }
 
 		//debug(fmt.Sprintf("time Iteration %v: %v\n",i, timeI))
 		UNUSED(timeI, tDK)

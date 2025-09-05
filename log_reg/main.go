@@ -28,6 +28,12 @@ func debug(s string) {
 // UNUSED allows unused variables to be included in Go programs
 func UNUSED(x ...interface{}) {}
 
+// This method trains a logistic regrestion and stores results in the specified file
+// Following variables can be set:
+// scaling: 			scaling factor
+// it: 	number of training iterations
+// epsilon: 		for DP (delta is set to 1/#rec) (does not have an affect on the runtime)
+// rounds: how many rounds this should run
 func main() {
 
 	fmt.Println("started training and benchmarking on data sets")
@@ -54,26 +60,26 @@ func main() {
 	}
 	epsilon = []float64{5.0}
 
-	filePrefix := "./datasets/"                                   //training
-	files := []string{"syntetic100x31.csv", "syntetic500x31.csv"} //"syntetic189x3.csv", "trainingLBW.csv", "syntetic380x3.csv", "trainingPCS.csv", "syntetic575x3.csv", "trainingUIS.csv", "syntetic16427x4.csv", "trainingNhanes.csv"} //"LBW.csv", "PCS.csv", "UIS.csv", "Nhanes.csv"}
+	filePrefix := "./datasets/training"
+	files := []string{"LBW.csv", "PCS.csv", "UIS.csv", "Nhanes.csv"}
 
 	//batchsize and alpha in dependency of data set
-	alphaF := [][]float64{[]float64{0.3}, []float64{0.3}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}, []float64{0.1}} //, []float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}}
+	alphaF := [][]float64{[]float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}}
 
 	for _, iterations := range it {
 
-		fileRes := "resultsDegree1_Syntetic.txt" // + fmt.Sprint(iterations) + ".txt"
+		fileRes := "results" + fmt.Sprint(iterations) + ".txt"
 
 		write(fileRes, "time in Nanosec\n", true)
-		//write(fileRes, "eps = ", true)
-		//write(fileRes, fmt.Sprintln(epsilon), true)
+		write(fileRes, "eps = ", true)
+		write(fileRes, fmt.Sprintln(epsilon), true)
 
 		for fI, file := range files {
 			alphaS := alphaF[fI]
 
 			debug(fmt.Sprintf("****************file: %v**********************\n", file))
 			write(fileRes, fmt.Sprintf(file), true)
-			//write(fileRes, "= [ ", true)
+			write(fileRes, "= [ ", true)
 
 			// read data
 			file = filePrefix + file
@@ -170,11 +176,11 @@ func main() {
 
 				}
 
-				//	write(fileRes, fmt.Sprintf("%v, ", max[1]), true)
+				write(fileRes, fmt.Sprintf("%v, ", max[1]), true)
 				fmt.Printf("-- max: %v\n", max)
 			}
 			debug(fmt.Sprintf("average time LogReg: %v\n", timeTotal))
-			//write(fileRes, fmt.Sprintf("]\n"), true)
+			write(fileRes, fmt.Sprintf("]\n"), true)
 			write(fileRes, fmt.Sprintf(" av time: %v\n", timeTotal), true)
 
 		}
@@ -183,6 +189,7 @@ func main() {
 
 }
 
+// writes result into file
 func write(filename string, message string, append bool) {
 
 	var file *os.File
@@ -206,6 +213,7 @@ func write(filename string, message string, append bool) {
 
 }
 
+// load test data from csv files
 func loadTestData(file string) [][]float64 {
 	f, err := os.Open(file)
 	if err != nil {
@@ -233,7 +241,7 @@ func loadTestData(file string) [][]float64 {
 	return dataT
 }
 
-// //
+// load training data from csv files
 func loadData(file string, scaling int) (float64, int, data.Matrix, map[string]int) {
 
 	f, err := os.Open(file)
@@ -266,7 +274,6 @@ func loadData(file string, scaling int) (float64, int, data.Matrix, map[string]i
 	dataX := make(data.Matrix, len(records))
 	indices := make(map[string]int)
 
-	//blocklength for lookup table
 	b := big.NewInt(8)
 
 	var i, j, k, v int64
@@ -321,6 +328,7 @@ func loadData(file string, scaling int) (float64, int, data.Matrix, map[string]i
 	return float64(len(records[0]) - 1), m, dataX, indices
 }
 
+// compute accuracy on testdata for given model weights theta
 func compAcc(data [][]float64, theta []float64) float64 {
 
 	sum := 0.0
