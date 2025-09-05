@@ -44,9 +44,10 @@ echo 'export PATH=$PATH:$HOME/go/bin' >>$HOME/.profile
   
 - install bazel on your system, at least version 6.4.0 (https://bazel.build/install)
 ```bash
+sudo apt install apt-transport-https curl gnupg -y
 curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
 sudo mv bazel-archive-keyring.gpg /etc/apt/trusted.gpg.d/
-echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list 
+echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list 
 sudo apt  update -y 
 sudo apt install bazel=6.4.0
 ```
@@ -75,6 +76,7 @@ cd differentially_private_functional_encryption
 ```
 
 now you can run the source code of the experiment by typing ```go run .``` in one of the two folders from the artifact (see below in subsection Experiments).
+
 
 
 
