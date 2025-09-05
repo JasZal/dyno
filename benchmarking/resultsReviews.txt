@@ -1,4 +1,0 @@
-benchmarking MCFE_OT, DiffPIPE
-Times in millisec
-DS n,m,Setup, Enc, KeyGen, Dec
-NMMCFE
