@@ -1,4 +1,6 @@
 import os.path
+import re
+import ast
 
 import matplotlib.pyplot as plt
 
@@ -10,9 +12,14 @@ def read_data(filename):
             if "=" in line:
                 name, values = line.split("=")
                 name = name.strip()
-                values = eval(values.strip())
+                values = values.strip()
+                if "[" in values and " " in values and "," not in values:
+                    values = re.sub(r"\s+", ", ", values)
+
+                values = ast.literal_eval(values)
                 data[name] = values
     return data
+
 
 # Set fixed colors
 colors = {
