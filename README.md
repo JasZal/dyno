@@ -64,7 +64,6 @@ cd ../..
 - clone the artifact (https://github.com/JasZal/dyno)
 ```bash
 git clone https://github.com/JasZal/dyno
-cd differentially_private_functional_encryption
 ```
 
 ## Run Code
