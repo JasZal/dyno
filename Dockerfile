@@ -1,17 +1,16 @@
-FROM golang:1.21
+FROM golang:1.24
 
 # Install Python3, pip, git, bash, and dependencies needed for matplotlib
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-matplotlib \
     git \
     bash \
     libfreetype6-dev \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install matplotlib via pip
-RUN pip3 install matplotlib
 
 WORKDIR /app
 
@@ -25,5 +24,9 @@ RUN chmod +x run.sh
 # Declare results folder as a volume
 VOLUME ["/app/results"]
 
-# Run the script
+# Run the script either with or without the biggest dataset Nhanes
+# default: run without Nhanes
 CMD ["./run.sh"]
+
+#to include Nhanes change above line to 
+#CMD ["./run.sh --includeNahnes]
