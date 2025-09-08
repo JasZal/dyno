@@ -52,13 +52,14 @@ plt.ylabel("accuracy")
 plt.title("Model utility")
 plt.legend()
 
+plt.savefig("log_reg_utility.pdf", bbox_inches="tight")  
 plt.show()
 
 # Only plot NHANES utilities if file has been created
 if os.path.exists("log_reg_utility_nhanes.txt"):
 
     # Utility of Nhanes using Dyno
-    utility_nhanes = read_data("log_reg_utility_Nhanes.txt")
+    utility_nhanes = read_data("log_reg_utility_nhanes.txt")
     eps = utility_nhanes["eps"]
     for key, values in utility_nhanes.items():
         if key != "eps":
@@ -76,5 +77,6 @@ if os.path.exists("log_reg_utility_nhanes.txt"):
     plt.title("Model utility Nhanes")
     plt.legend()
 
+    plt.savefig("log_reg_utility_nhanes.pdf", bbox_inches="tight")  
     plt.show()
 
