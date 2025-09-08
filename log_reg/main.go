@@ -63,7 +63,7 @@ func main() {
 
 	//change stepcounter to get more datapoints
 	var epsilon []float64
-	for i := 0.00; i <= 5.0; i += 0.5 {
+	for i := 0.00; i <= 8.0; i += 0.5 {
 		if i == 0.0 {
 			epsilon = append(epsilon, 0.01)
 		} else {
@@ -88,15 +88,16 @@ func main() {
 	for fI, file := range files {
 
 		if file == "Nhanes" {
+			rounds = 1
 			if !*includeNahnes {
-				continue
+				epsilon = []float64{5}
+
 			} else {
 				fileUtility = fileUtilityNhanes
 				write(fileUtility, "eps = ", false)
 				write(fileUtility, fmt.Sprintln(epsilon), true)
 				it = []int{50, 100, 150}
-				rounds = 1
-				epsilon = []float64{0.01, 1, 2, 3, 4, 5}
+				epsilon = []float64{0.01, 1, 2, 3, 4, 5, 6, 7, 8}
 			}
 		}
 
@@ -108,8 +109,10 @@ func main() {
 			debug(fmt.Sprintf("****************file: %v**********************\n", file))
 			deb = false
 
-			write(fileUtility, fmt.Sprintf(file+"%v", iterations), true)
-			write(fileUtility, "= [ ", true)
+			if file != "Nhanes" || *includeNahnes {
+				write(fileUtility, fmt.Sprintf(file+"%v", iterations), true)
+				write(fileUtility, "= [ ", true)
+			}
 
 			// read data
 			file = filePrefix + file + filePostfix
@@ -205,12 +208,15 @@ func main() {
 					debug(fmt.Sprintf("alpha %v, accuracy: %v\n", alpha, acc))
 
 				}
-
-				write(fileUtility, fmt.Sprintf("%v, ", max[1]), true)
+				if file != "Nhanes" || *includeNahnes {
+					write(fileUtility, fmt.Sprintf("%v, ", max[1]), true)
+				}
 				//fmt.Printf("-- max: %v\n", max)
 			}
 			debug(fmt.Sprintf("average time LogReg: %v\n", timeTotal))
-			write(fileUtility, fmt.Sprintf("]\n"), true)
+			if file != "Nhanes" || *includeNahnes {
+				write(fileUtility, fmt.Sprintf("]\n"), true)
+			}
 			write(fileRuntime, fmt.Sprintf(fmt.Sprintf(file+"%v:  av time: %v\n", iterations, timeTotal/60000000000.0)), true)
 
 		}
