@@ -1,0 +1,73 @@
+import os.path
+
+import matplotlib.pyplot as plt
+
+# Function to read .txt files
+def read_data(filename):
+    data = {}
+    with open(filename, "r") as f:
+        for line in f:
+            if "=" in line:
+                name, values = line.split("=")
+                name = name.strip()
+                values = eval(values.strip())
+                data[name] = values
+    return data
+
+# Set fixed colors
+colors = {
+    "LBW": "blue",
+    "PCS": "orange",
+    "UIS": "green",
+}
+
+# Utilities of LBW, PCS and UIS using Dyno
+utility_dyno = read_data("log_reg_utility.txt")
+eps1 = utility_dyno["eps"]
+
+for key, values in utility_dyno.items():
+    if key != "eps":
+        plt.plot(eps1, values, color=colors.get(key, None), linestyle="-", label=key)
+
+
+# Utilities of LDP approach
+utility_ldp = read_data("log_reg_utility_ldp.txt")
+eps2 = utility_ldp["eps"]
+
+
+for key, values in utility_ldp.items():
+    if key != "eps":
+        plt.plot(eps2, values, color=colors.get(key, None), linestyle="--", label=None)
+
+
+plt.xlabel("eps_max")
+plt.ylabel("accuracy")
+plt.title("Model utility")
+plt.legend()
+
+plt.show()
+
+# Only plot NHANES utilities if file has been created
+if os.path.exists("log_reg_utility_nhanes.txt"):
+
+    # Utility of Nhanes using Dyno
+    utility_nhanes = read_data("log_reg_utility_Nhanes.txt")
+    eps = utility_nhanes["eps"]
+    for key, values in utility_nhanes.items():
+        if key != "eps":
+            plt.plot(eps, values, linestyle="-", label=f"it = {key}")
+
+    # Utilities of LDP approach
+    utility_nhanes_ldp = read_data("log_reg_utility_nhanes_ldp.txt")
+    eps_nhanes_ldp = utility_nhanes_ldp["eps"]
+    for key, values in utility_nhanes_ldp.items():
+        if key != "eps":
+            plt.plot(eps_nhanes_ldp, values, color="black", linestyle="--", label="LDP")
+
+    plt.xlabel("eps_max")
+    plt.ylabel("accuracy")
+    plt.title("Model utility Nhanes")
+    plt.legend()
+
+    plt.show()
+
