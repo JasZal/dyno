@@ -7,7 +7,7 @@
 INCLUDE_NAHNES=false
 
 if [[ "$1" == "--includeNahnes" ]]; then
-  includeNahnes=true
+  INCLUDE_NAHNES=true
 fi
 
 

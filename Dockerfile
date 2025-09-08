@@ -29,4 +29,4 @@ VOLUME ["/app/results"]
 CMD ["./run.sh"]
 
 #to include Nhanes change above line to 
-#CMD ["./run.sh --includeNahnes]
+#CMD ["./run.sh --includeNahnes"]
