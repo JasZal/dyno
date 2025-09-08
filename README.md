@@ -49,25 +49,6 @@ echo 'export PATH=$PATH:$HOME/go/bin' >>$HOME/.profile
 sudo apt install -y python3 python3-pip
 pip3 install matplotlib
 ```
-  
-- install bazel on your system, at least version 7.5.0 (https://bazel.build/install)
-```bash
-sudo apt install apt-transport-https curl gnupg -y
-curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-sudo mv bazel-archive-keyring.gpg /etc/apt/trusted.gpg.d/
-echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list 
-sudo apt  update -y 
-sudo apt install bazel=7.5.0
-```
-
-- clone and install the differntial privacy library from google (https://github.com/google/differential-privacy)
-```bash 
-git clone https://github.com/google/differential-privacy.git
-cd differential-privacy
-cd go
-bazel build ...
-cd ../..
-```
 
 - clone the artifact (https://github.com/JasZal/dyno)
 ```bash
