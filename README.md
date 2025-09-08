@@ -29,7 +29,7 @@ at least 8 GB RAM
 
 ### Software Requirements
 - OS: Ubuntu (at least version 20.04)
-- Software: go (at least version 1.21.4), bazel (at least version 6.4.0), python using matplotlib
+- Software: go (at least version 1.21.4), bazel (at least version 7.5.0), python using matplotlib
 
 
 ## Set up the environment
