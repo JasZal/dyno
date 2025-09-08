@@ -23,9 +23,9 @@ def read_data(filename):
 
 # Set fixed colors
 colors = {
-    "LBW": "blue",
-    "PCS": "orange",
-    "UIS": "green",
+    "LBW50": "blue",
+    "PCS50": "orange",
+    "UIS50": "green",
 }
 
 # Utilities of LBW, PCS and UIS using Dyno

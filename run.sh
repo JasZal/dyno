@@ -8,13 +8,13 @@ INCLUDE_NAHNES=true
 
 
 echo "start benchmarking DyNo"
-time go run ./benchmarking 
+go run ./benchmarking 
 echo "finished benchmarking DyNo"
 
 
 echo "start logistic regression training"
 
-time go run ./log_reg --includeNahnes=$INCLUDE_NAHNES
+go run ./log_reg --includeNahnes=$INCLUDE_NAHNES
 
 echo "finished logistic regression training"
 
