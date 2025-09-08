@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"math"
@@ -17,7 +18,7 @@ import (
 	"github.com/JasZal/gofe/innerprod/noisy"
 )
 
-var deb bool = true
+var deb bool = false
 
 func debug(s string) {
 	if deb {
@@ -36,7 +37,17 @@ func UNUSED(x ...interface{}) {}
 // rounds: how many rounds this should run
 func main() {
 
-	fmt.Println("started training and benchmarking on data sets")
+	//determine wether training is performed on Nhanes or not for efficiency reasons
+	includeNahnes := flag.Bool("includeNahnes", false, "Include Nahnes logic")
+	flag.Parse()
+
+	fmt.Println("started training on data sets")
+
+	if *includeNahnes {
+		fmt.Println("Including dataset Nahnes")
+	} else {
+		fmt.Println("Skipping dataset Nahnes, only training on LBW, PCS and UIS.")
+	}
 
 	scaling := 1000000000
 	boundX := big.NewInt(int64(1 * scaling))
@@ -50,6 +61,7 @@ func main() {
 	it := []int{50}
 	nrWorkers := runtime.NumCPU()
 
+	//change stepcounter to get more datapoints
 	var epsilon []float64
 	for i := 0.00; i <= 5.0; i += 0.5 {
 		if i == 0.0 {
@@ -58,31 +70,47 @@ func main() {
 			epsilon = append(epsilon, i)
 		}
 	}
-	epsilon = []float64{5.0}
 
-	filePrefix := "./datasets/training"
-	files := []string{"LBW.csv", "PCS.csv", "UIS.csv", "Nhanes.csv"}
+	filePrefix := "./log_reg/datasets/training"
+	files := []string{"LBW", "PCS", "UIS", "Nhanes"}
+	filePostfix := ".csv"
+	fileUtility := "./results/log_reg_utility.txt"
+	fileUtilityNhanes := "./results/log_reg_utility_nhanes.txt"
+	fileRuntime := "./results/log_reg_runtime.txt"
+
+	write(fileRuntime, "time in Minutes\n", false)
+	write(fileUtility, "eps = ", false)
+	write(fileUtility, fmt.Sprintln(epsilon), true)
 
 	//batchsize and alpha in dependency of data set
-	alphaF := [][]float64{[]float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}}
+	alphaF := [][]float64{[]float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}, []float64{0.6, 0.9}}
 
-	for _, iterations := range it {
+	for fI, file := range files {
 
-		fileRes := "results" + fmt.Sprint(iterations) + ".txt"
+		if file == "Nhanes" {
+			if !*includeNahnes {
+				continue
+			} else {
+				fileUtility = fileUtilityNhanes
+				write(fileUtility, "eps = ", false)
+				write(fileUtility, fmt.Sprintln(epsilon), true)
+				it = []int{50, 100, 150}
+			}
+		}
 
-		write(fileRes, "time in Nanosec\n", true)
-		write(fileRes, "eps = ", true)
-		write(fileRes, fmt.Sprintln(epsilon), true)
+		for _, iterations := range it {
 
-		for fI, file := range files {
 			alphaS := alphaF[fI]
 
+			deb = true
 			debug(fmt.Sprintf("****************file: %v**********************\n", file))
-			write(fileRes, fmt.Sprintf(file), true)
-			write(fileRes, "= [ ", true)
+			deb = false
+
+			write(fileUtility, fmt.Sprintf(file+"%v", iterations), true)
+			write(fileUtility, "= [ ", true)
 
 			// read data
-			file = filePrefix + file
+			file = filePrefix + file + filePostfix
 			attr, m, dataPlain, keys := loadData(file, scaling)
 			testData := loadTestData(file)
 			debug("data loaded")
@@ -147,13 +175,13 @@ func main() {
 
 						tE := time.Since(startE)
 						UNUSED(tE)
-						fmt.Printf("time Encryption total: %v\n", tE)
+						//fmt.Printf("time Encryption total: %v\n", tE)
 
 						// setup evaluator
 						e := NewEvaluator(int(attr), n, scaling, ct, a, batchsize, eps, delta)
 						// start training
 						theta, tReg, err := e.trainLogReg(iterations, alpha)
-						fmt.Printf("theta: %v\n", theta)
+						//fmt.Printf("theta: %v\n", theta)
 
 						if err != nil {
 							fmt.Printf("Runtime: %v\n", tReg)
@@ -176,12 +204,12 @@ func main() {
 
 				}
 
-				write(fileRes, fmt.Sprintf("%v, ", max[1]), true)
-				fmt.Printf("-- max: %v\n", max)
+				write(fileUtility, fmt.Sprintf("%v, ", max[1]), true)
+				//fmt.Printf("-- max: %v\n", max)
 			}
 			debug(fmt.Sprintf("average time LogReg: %v\n", timeTotal))
-			write(fileRes, fmt.Sprintf("]\n"), true)
-			write(fileRes, fmt.Sprintf(" av time: %v\n", timeTotal), true)
+			write(fileUtility, fmt.Sprintf("]\n"), true)
+			write(fileRuntime, fmt.Sprintf(" av time: %v\n", timeTotal/60000000000.0), true)
 
 		}
 

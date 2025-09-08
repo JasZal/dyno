@@ -57,8 +57,8 @@ func UNUSED(...interface{}) {}
 // rounds: describes the number of rounds that time is averaged about
 // distr: describes how the data set is distritbuted between n and m, possible values: 0, 0.5 and 1
 func main() {
-	results := "resultsReviews.txt"
-	prefix := "./datasets/"
+	results := "./results/benchmarking_runtime.txt"
+	prefix := "./benchmarking/datasets/"
 	postfix := ".txt"
 	format := "millisec"
 	conversion := make(map[string]float64)
@@ -76,8 +76,9 @@ func main() {
 	nrWorkers := runtime.NumCPU()
 
 	//generateData(datapoints, boundX, boundY)
-	write(results, "benchmarking Dyno, DiffPIPE\nTimes in "+format+"\nDS n,m,Setup, Enc, KeyGen, Dec\n", false)
-	write(results, "NMMCFE\n", true)
+	//write(results, "benchmarking Dyno, DiffPIPE\nTimes in "+format+"\nDS n,m,Setup, Enc, KeyGen, Dec\n", false)
+	//write(results, "NMMCFE\n", true)
+	write(results, "benchmarking Dyno\nTimes in "+format+"\n n,m,Setup, Enc, KeyGen, Dec\n", false)
 
 	for _, dp := range datapoints {
 		for _, distr := range distribution {
@@ -112,7 +113,7 @@ func main() {
 				tD += float64(timeD.Nanoseconds()) / float64(rounds)
 			}
 
-			fmt.Printf("Dyno: setup: %.3f %v, enc %.3f %v, keygen %.3f %v, dec %.3f %v\n", tS/conversion[format], format, tE/conversion[format], format, tKG/conversion[format], format, tD/conversion[format], format)
+			//fmt.Printf("Dyno: setup: %.3f %v, enc %.3f %v, keygen %.3f %v, dec %.3f %v\n", tS/conversion[format], format, tE/conversion[format], format, tKG/conversion[format], format, tD/conversion[format], format)
 
 			//write results
 			write(results, fmt.Sprintf(" %v & %v& %.3f&%.3f&%.3f&%.3f\\\\\n", n, m, tS/conversion[format], tE/conversion[format], tKG/conversion[format], tD/conversion[format]), true)

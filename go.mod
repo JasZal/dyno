@@ -3,7 +3,7 @@ module DifFE/innerproduct/noot
 go 1.24.6
 
 require (
-	github.com/JasZal/gofe v1.2.0
+	github.com/JasZal/gofe v1.2.1
 	github.com/fentec-project/bn256 v0.0.0-20190726093940-0d0fc8bfeed0
 	github.com/google/differential-privacy/go v1.1.2
 )
