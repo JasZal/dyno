@@ -35,13 +35,19 @@ at least 8 GB RAM
 ## Set up the environment
 Follow the above instruction:
 
-(Assuming Ubuntu 20.04)
+(Assuming Ubuntu 22)
 - install go on your system (https://go.dev/doc/install)
 ```bash
 curl -O -L "https://golang.org/dl/go${GO_VERSION}.linux-${ARCH}.tar.gz" 
 tar -xf "go${GO_VERSION}.linux-${ARCH}.tar.gz" && mv -v go /usr/local
 echo 'export PATH=$PATH:/usr/local/go/bin' >>$HOME/.profile
 echo 'export PATH=$PATH:$HOME/go/bin' >>$HOME/.profile
+```
+
+-install python on your system, including matplotlib
+```bash
+sudo apt install -y python3 python3-pip
+pip3 install matplotlib
 ```
   
 - install bazel on your system, at least version 7.5.0 (https://bazel.build/install)
