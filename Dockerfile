@@ -22,5 +22,8 @@ RUN git clone ${REPO_URL} .
 # Make run.sh executable
 RUN chmod +x run.sh
 
+# Declare results folder as a volume
+VOLUME ["/app/results"]
+
 # Run the script
 CMD ["./run.sh"]
