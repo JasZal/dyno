@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# run the log_Reg training, either including the biggest dataset Nhanes or skipping it 
-# for skipping it please set "INCLUDE_NHANES" to false
+# run the log_Reg training, either skipping the biggest dataset Nhanes or including it 
+# for including it please set "INCLUDE_NHANES" to true
 
-# default include Nhanes
-INCLUDE_NAHNES=true
+# default skip Nhanes (false)
+INCLUDE_NAHNES=false
+
+if [[ "$1" == "--includeNahnes" ]]; then
+  includeNahnes=true
+fi
 
 
 echo "start benchmarking DyNo"
@@ -20,7 +24,7 @@ echo "finished logistic regression training"
 
 
 echo "build figures"
-# todo add python script
+python3 ./results/build_plots.py
 echo "finished everything"
 
 
