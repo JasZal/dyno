@@ -51,6 +51,7 @@ plt.xlabel("eps_max")
 plt.ylabel("accuracy")
 plt.title("Model utility")
 plt.legend()
+plt.xlim(0, 8)
 
 plt.savefig("log_reg_utility.pdf", bbox_inches="tight")  
 plt.show()
@@ -76,6 +77,7 @@ if os.path.exists("log_reg_utility_nhanes.txt"):
     plt.ylabel("accuracy")
     plt.title("Model utility Nhanes")
     plt.legend()
+    plt.xlim(0, 8)
 
     plt.savefig("log_reg_utility_nhanes.pdf", bbox_inches="tight")  
     plt.show()
