@@ -67,8 +67,9 @@ git clone https://github.com/JasZal/dyno
 cd differentially_private_functional_encryption
 ```
 
-now you can run the source code of the experiment by typing ```go run .``` in one of the two folders from the artifact (see below in subsection Experiments).
-
+## Run Code
+now you can run the source code of the experiment by starting the run.sh script. This will start the benchmarking and log_reg evaluation and will store all results in the folder "results". 
+Expected runtime depends highly on the system and the number of cores. 
 
 
 
