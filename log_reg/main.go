@@ -57,7 +57,7 @@ func main() {
 	noisyB := true
 
 	// attributes
-	rounds := 1
+	rounds := 3
 	it := []int{50}
 	nrWorkers := runtime.NumCPU()
 
@@ -95,6 +95,8 @@ func main() {
 				write(fileUtility, "eps = ", false)
 				write(fileUtility, fmt.Sprintln(epsilon), true)
 				it = []int{50, 100, 150}
+				rounds = 1
+				epsilon = []float64{0.01, 1, 2, 3, 4, 5}
 			}
 		}
 
@@ -209,7 +211,7 @@ func main() {
 			}
 			debug(fmt.Sprintf("average time LogReg: %v\n", timeTotal))
 			write(fileUtility, fmt.Sprintf("]\n"), true)
-			write(fileRuntime, fmt.Sprintf(" av time: %v\n", timeTotal/60000000000.0), true)
+			write(fileRuntime, fmt.Sprintf(fmt.Sprintf(file+"%v:  av time: %v\n", iterations, timeTotal/60000000000.0)), true)
 
 		}
 
