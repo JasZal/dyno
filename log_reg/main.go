@@ -44,9 +44,9 @@ func main() {
 	fmt.Println("started training on data sets")
 
 	if *includeNahnes {
-		fmt.Println("Including dataset Nahnes")
+		fmt.Println("Including dataset Nhanes")
 	} else {
-		fmt.Println("Skipping dataset Nahnes, only training on LBW, PCS and UIS.")
+		fmt.Println("Skipping dataset Nhanes, only training on LBW, PCS and UIS.")
 	}
 
 	scaling := 1000000000
@@ -115,9 +115,9 @@ func main() {
 			}
 
 			// read data
-			file = filePrefix + file + filePostfix
-			attr, m, dataPlain, keys := loadData(file, scaling)
-			testData := loadTestData(file)
+			fileData := filePrefix + file + filePostfix
+			attr, m, dataPlain, keys := loadData(fileData, scaling)
+			testData := loadTestData(fileData)
 			debug("data loaded")
 
 			n := len(dataPlain)
