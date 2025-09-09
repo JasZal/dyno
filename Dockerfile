@@ -22,7 +22,7 @@ RUN git clone ${REPO_URL} .
 RUN chmod +x run.sh
 
 # Declare results folder as a volume
-VOLUME ["/app/results"]
+VOLUME ["/app/artifactResults"]
 
 # Run the script either with or without the biggest dataset Nhanes
 # default: run without Nhanes
