@@ -26,3 +26,27 @@ python3 ./results/build_plots.py
 echo "finished everything"
 
 
+mkdir -p /artifactResults
+
+# copy files to volume folder
+FILES=(
+  "log_reg_utility.pdf"
+  "log_reg_utility.txt"
+  "log_reg_runtime.txt"
+  "benchmarking_runtime.txt"
+  "log_reg_utility_nhanes.txt"
+  "log_reg_utility_nhanes.pdf"
+)
+
+for file in "${FILES[@]}"; do
+    src="./results/$file"
+    if [ -f "$src" ]; then
+        cp "$src" /artifactResults/
+        echo "copied  $file"
+    else
+        echo "did not find $file"
+    fi
+done
+
+
+
