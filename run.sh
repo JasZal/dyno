@@ -12,14 +12,12 @@ fi
 
 
 echo "start benchmarking DyNo"
-go run ./benchmarking 
+#go run ./benchmarking 
 echo "finished benchmarking DyNo"
 
 
 echo "start logistic regression training"
-
-go run ./log_reg --includeNahnes=$INCLUDE_NAHNES
-
+#go run ./log_reg --includeNahnes=$INCLUDE_NAHNES
 echo "finished logistic regression training"
 
 
