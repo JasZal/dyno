@@ -1,6 +1,7 @@
 import os.path
 import re
 import ast
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -34,7 +35,8 @@ eps1 = utility_dyno["eps"]
 
 for key, values in utility_dyno.items():
     if key != "eps":
-        plt.plot(eps1, values, color=colors.get(key, None), linestyle="-", label=key)
+        values_conv = [value if value > 0 else np.nan for value in values] # Only plot utilities if model did converge
+        plt.plot(eps1, values_conv, color=colors.get(key, None), linestyle="-", label=key)
 
 
 # Utilities of LDP approach
@@ -52,6 +54,7 @@ plt.ylabel("accuracy")
 plt.title("Model utility")
 plt.legend()
 plt.xlim(0, 8)
+plt.ylim(0.4, 0.8)
 
 plt.savefig("./results/log_reg_utility.pdf", bbox_inches="tight")  
 plt.show()
@@ -64,7 +67,8 @@ if os.path.exists("./results/log_reg_utility_nhanes.txt"):
     eps = utility_nhanes["eps"]
     for key, values in utility_nhanes.items():
         if key != "eps":
-            plt.plot(eps, values, linestyle="-", label=f"it = {key}")
+            values_conv = [value if value > 0 else np.nan for value in values]
+            plt.plot(eps, values_conv, linestyle="-", label=f"it = {key}")
 
     # Utilities of LDP approach
     utility_nhanes_ldp = read_data("./results/log_reg_utility_nhanes_ldp.txt")
@@ -78,6 +82,7 @@ if os.path.exists("./results/log_reg_utility_nhanes.txt"):
     plt.title("Model utility Nhanes")
     plt.legend()
     plt.xlim(0, 8)
+    plt.ylim(0.4, 0.9)
 
     plt.savefig("./results/log_reg_utility_nhanes.pdf", bbox_inches="tight")  
     plt.show()
