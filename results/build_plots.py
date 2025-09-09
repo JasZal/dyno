@@ -29,7 +29,7 @@ colors = {
 }
 
 # Utilities of LBW, PCS and UIS using Dyno
-utility_dyno = read_data("log_reg_utility.txt")
+utility_dyno = read_data("./results/log_reg_utility.txt")
 eps1 = utility_dyno["eps"]
 
 for key, values in utility_dyno.items():
@@ -38,7 +38,7 @@ for key, values in utility_dyno.items():
 
 
 # Utilities of LDP approach
-utility_ldp = read_data("log_reg_utility_ldp.txt")
+utility_ldp = read_data("./results/log_reg_utility_ldp.txt")
 eps2 = utility_ldp["eps"]
 
 
@@ -53,21 +53,21 @@ plt.title("Model utility")
 plt.legend()
 plt.xlim(0, 8)
 
-plt.savefig("log_reg_utility.pdf", bbox_inches="tight")  
+plt.savefig("./results/log_reg_utility.pdf", bbox_inches="tight")  
 plt.show()
 
 # Only plot NHANES utilities if file has been created
-if os.path.exists("log_reg_utility_nhanes.txt"):
+if os.path.exists("./results/log_reg_utility_nhanes.txt"):
 
     # Utility of Nhanes using Dyno
-    utility_nhanes = read_data("log_reg_utility_nhanes.txt")
+    utility_nhanes = read_data("./results/log_reg_utility_nhanes.txt")
     eps = utility_nhanes["eps"]
     for key, values in utility_nhanes.items():
         if key != "eps":
             plt.plot(eps, values, linestyle="-", label=f"it = {key}")
 
     # Utilities of LDP approach
-    utility_nhanes_ldp = read_data("log_reg_utility_nhanes_ldp.txt")
+    utility_nhanes_ldp = read_data("./results/log_reg_utility_nhanes_ldp.txt")
     eps_nhanes_ldp = utility_nhanes_ldp["eps"]
     for key, values in utility_nhanes_ldp.items():
         if key != "eps":
@@ -79,6 +79,6 @@ if os.path.exists("log_reg_utility_nhanes.txt"):
     plt.legend()
     plt.xlim(0, 8)
 
-    plt.savefig("log_reg_utility_nhanes.pdf", bbox_inches="tight")  
+    plt.savefig("./results/log_reg_utility_nhanes.pdf", bbox_inches="tight")  
     plt.show()
 
