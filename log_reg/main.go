@@ -46,7 +46,7 @@ func main() {
 	if *includeNahnes {
 		fmt.Println("Including dataset Nhanes")
 	} else {
-		fmt.Println("Skipping dataset Nhanes, only training on LBW, PCS and UIS.")
+		fmt.Println("Skipping dataset Nhanes for utility results, only train once for epsilon=5 for runtime measurement")
 	}
 
 	scaling := 1000000000
