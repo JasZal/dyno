@@ -57,13 +57,13 @@ func main() {
 	noisyB := true
 
 	// attributes
-	rounds := 3
+	rounds := 1
 	it := []int{50}
 	nrWorkers := runtime.NumCPU()
 
 	//change stepcounter to get more datapoints
 	var epsilon []float64
-	for i := 0.00; i <= 8.0; i += 0.5 {
+	for i := 0.00; i <= 8.0; i += 1 {
 		if i == 0.0 {
 			epsilon = append(epsilon, 0.01)
 		} else {
