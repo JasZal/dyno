@@ -85,12 +85,15 @@ func main() {
 	//batchsize and alpha in dependency of data set
 	alphaF := [][]float64{[]float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}, []float64{0.6, 0.9}}
 
+
+
 	for fI, file := range files {
 
 		if file == "Nhanes" {
 			rounds = 1
 			if !*includeNahnes {
 				epsilon = []float64{5}
+				alphaF[fI] = []float64{0.9}
 
 			} else {
 				fileUtility = fileUtilityNhanes
