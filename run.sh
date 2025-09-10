@@ -42,11 +42,8 @@ for file in "${FILES[@]}"; do
     src="./results/$file"
     if [ -f "$src" ]; then
         cp "$src" /artifactResults/
-        echo "copied  $file"
-    else
-        echo "did not find $file"
     fi
 done
 
-
+echo "saved results"
 
