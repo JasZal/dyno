@@ -10,22 +10,13 @@ The addition to the gofe library are different schemes including the scheme "DyN
 Our example in the folder "benchmarking" shows a comparison between the "Dyno" and another noisy FE scheme called "DiffPipe", that are used to create Table 3 in the original Paper ("Enhancing Noisy Functional Encryption for Privacy-Preserving Machine Learning").
 The code in folder "log_reg" demonstrates the training of a logistic regression using the proposed protocoll with DyNo. 
 
-
-## TL;DR
-
-To run the example first install the forked [gofe library](https://github.com/JasZal/gofe) and the [differential privacy library](https://github.com/google/differential-privacy). Make sure you have installed all dependencies, e.g. bazel.
-You can either run the run.sh script or to produce the individual claims for benchmarking and log reg individually as described below. 
-For the runtimes of Table 3, please into the 'benchmarking' folder and run benchmarking.go.
-To compute the runtime for the logistic regression navigate to 'log_reg' folder and run main.go
-
-
 ## Description
 This artifact is the source code that was used to measure the scheme linked to Table 3-5 and  Figures 2-3 in the paper  'Enhancing Noisy Functional Encryption for Privacy-Preserving Machine Learning' by Scheu-Hachtel and Zalonis, 2025. 
 
 ## Basic Requirements
 
 ### Hardware Requirements
-at least 8 GB RAM
+at least 8 GB RAM (to include the largest Dataset 50GB)
 
 ### Software Requirements
 - OS: Ubuntu (at least version 20.04)
@@ -33,8 +24,26 @@ at least 8 GB RAM
 
 
 ## Set up the environment
-Follow the above instruction:
+Either use the presented Dockerfile or follow the above instruction:
 
+##Docker: (Assuming Ubuntu 22)
+- install docker
+'''bash
+sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo tee /etc/apt/sources.list.d/docker.list <<EOF
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+EOF
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io \
+  docker-buildx-plugin docker-compose-plugin
+'''
+- download Dockerfile
+
+## Without Docker:
 (Assuming Ubuntu 22)
 - install go on your system (https://go.dev/doc/install)
 ```bash
@@ -56,8 +65,22 @@ git clone https://github.com/JasZal/dyno
 ```
 
 ## Run Code
-now you can run the source code of the experiment by starting the run.sh script or start the claims individually as described above. This will start the benchmarking and log_reg evaluation and will store all results in the folder "results". 
-Following a python script will build the figures as displayed in the paper. Runtimes are stored in the respective txt files. 
+Docker:
+navigate in the folder where the dockerfile is and run
+'''bash
+docker build -t dyno .
+docker run --rm -v $(pwd)/artifactResults:/artifactResults dyno
+'''
+
+Without Docker:
+navigate in the cloned git and run
+'''bash
+./run.sh
+'''
+
+This will start the benchmarking and log_reg evaluation and will store all results in the folder "artifactResults". 
+Following a python script will build the figures as displayed in the paper. 
+Runtimes are stored in the respective txt files. 
 
 
 
