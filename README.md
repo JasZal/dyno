@@ -26,7 +26,7 @@ at least 8 GB RAM (to include the largest Dataset 50GB)
 ## Set up the environment
 Either use the presented Dockerfile or follow the above instruction:
 
-##Docker: (Assuming Ubuntu 22)
+## Docker: (Assuming Ubuntu 22)
 - install docker
 ```bash
 sudo apt install -y ca-certificates curl gnupg
@@ -81,7 +81,7 @@ navigate in the cloned git and run
 This will start the benchmarking and log_reg evaluation and will store all results in the folder "artifactResults". 
 Following a python script will build the figures as displayed in the paper. 
 Runtimes are stored in the respective txt files. 
-Note that the number of rounds over which the average is taken is currently 3 due to efficiency but can be increased to obtain a more robust result.
+Note that the number of rounds over which the average is taken is currently 3 due to efficiency but can be increased in the file 'log_reg/main.go' in Line 60 (resp. 93 for Nhanes) to obtain a more robust result. 
 
 
 
