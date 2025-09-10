@@ -28,7 +28,7 @@ Either use the presented Dockerfile or follow the above instruction:
 
 ##Docker: (Assuming Ubuntu 22)
 - install docker
-'''bash
+```bash
 sudo apt install -y ca-certificates curl gnupg
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
@@ -40,7 +40,7 @@ EOF
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io \
   docker-buildx-plugin docker-compose-plugin
-'''
+```
 - download Dockerfile
 
 ## Without Docker:
@@ -67,16 +67,16 @@ git clone https://github.com/JasZal/dyno
 ## Run Code
 Docker:
 navigate in the folder where the dockerfile is and run
-'''bash
+```bash
 docker build -t dyno .
 docker run --rm -v $(pwd)/artifactResults:/artifactResults dyno
-'''
+```
 
 Without Docker:
 navigate in the cloned git and run
-'''bash
+```bash
 ./run.sh
-'''
+```
 
 This will start the benchmarking and log_reg evaluation and will store all results in the folder "artifactResults". 
 Following a python script will build the figures as displayed in the paper. 
