@@ -26,7 +26,7 @@ at least 8 GB RAM (to include the largest Dataset 50GB)
 ## Set up the environment
 Either use the presented Dockerfile or follow the above instruction:
 
-##Docker: (Assuming Ubuntu 22)
+## Docker: (Assuming Ubuntu 22)
 - install docker
 ```bash
 sudo apt install -y ca-certificates curl gnupg
