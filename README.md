@@ -20,7 +20,7 @@ at least 8 GB RAM (to include the largest Dataset 50GB)
 
 ### Software Requirements
 - OS: Ubuntu (at least version 20.04)
-- Software: go (at least version 1.21.4), bazel (at least version 7.5.0), python using matplotlib
+- Software: go (at least version 1.21.4), bazel (at least version 7.5.0), python using matplotlib and numpy
 
 
 ## Set up the environment
@@ -53,10 +53,10 @@ echo 'export PATH=$PATH:/usr/local/go/bin' >>$HOME/.profile
 echo 'export PATH=$PATH:$HOME/go/bin' >>$HOME/.profile
 ```
 
--install python on your system, including matplotlib
+-install python on your system, including matplotlib and numpy
 ```bash
 sudo apt install -y python3 python3-pip
-pip3 install matplotlib
+pip3 install matplotlib numpy
 ```
 
 - clone the artifact (https://github.com/JasZal/dyno)
@@ -81,7 +81,7 @@ navigate in the cloned git and run
 This will start the benchmarking and log_reg evaluation and will store all results in the folder "artifactResults". 
 Following a python script will build the figures as displayed in the paper. 
 Runtimes are stored in the respective txt files. 
-
+Note that the number of rounds over which the average is taken is currently 3 due to efficiency but can be increased to obtain a more robust result.
 
 
 
