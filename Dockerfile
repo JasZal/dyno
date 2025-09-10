@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-matplotlib \
+    python3-numpy \
     git \
     bash \
     libfreetype6-dev \
