@@ -57,7 +57,7 @@ func main() {
 	noisyB := true
 
 	// attributes
-	rounds := 1
+	rounds := 3
 	it := []int{50}
 	nrWorkers := runtime.NumCPU()
 
