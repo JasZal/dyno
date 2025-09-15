@@ -63,12 +63,17 @@ func main() {
 
 	//change stepcounter to get more datapoints
 	var epsilon []float64
-	for i := 0.00; i <= 8.0; i += 1 {
+	for i := 0.00; i <= 2.5; i += 0.5 {
 		if i == 0.0 {
 			epsilon = append(epsilon, 0.01)
 		} else {
 			epsilon = append(epsilon, i)
 		}
+	}
+
+	for i := 3.0; i <= 8.0; i += 1 {
+		epsilon = append(epsilon, i)
+		
 	}
 
 	filePrefix := "./log_reg/datasets/training"
@@ -84,9 +89,7 @@ func main() {
 
 	//batchsize and alpha in dependency of data set
 	alphaF := [][]float64{[]float64{0.1}, []float64{0.1, 0.3, 0.6, 0.9}, []float64{0.1}, []float64{0.6, 0.9}}
-
-
-
+		
 	for fI, file := range files {
 
 		if file == "Nhanes" {
@@ -100,7 +103,7 @@ func main() {
 				write(fileUtility, "eps = ", false)
 				write(fileUtility, fmt.Sprintln(epsilon), true)
 				it = []int{50, 100, 150}
-				epsilon = []float64{0.01, 1, 2, 3, 4, 5, 6, 7, 8}
+				epsilon = []float64{0.01, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8}
 			}
 		}
 
