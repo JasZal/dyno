@@ -76,12 +76,12 @@ func main() {
 
 	}
 
-	filePrefix := "../artifact/log_reg/datasets/training"
+	filePrefix := "./artifact/log_reg/datasets/training"
 	files := []string{"LBW", "PCS", "UIS", "Nhanes"}
 	filePostfix := ".csv"
-	fileUtility := "../claim1/results/log_reg_utility.txt"
+	fileUtility := "./claim1/results/log_reg_utility.txt"
 	fileUtilityNhanes := "../claim1/results/log_reg_utility_nhanes.txt"
-	fileRuntime := "../claim1/results/log_reg_runtime.txt"
+	fileRuntime := "./claim1/results/log_reg_runtime.txt"
 
 	write(fileRuntime, "time in Minutes\n", false)
 	write(fileUtility, "eps = ", false)

@@ -57,8 +57,8 @@ func UNUSED(...interface{}) {}
 // rounds: describes the number of rounds that time is averaged about
 // distr: describes how the data set is distritbuted between n and m, possible values: 0, 0.5 and 1
 func main() {
-	results := "../claim1/results/benchmarking_runtime.txt"
-	prefix := "../artifact/benchmarking/datasets/"
+	results := "./claim1/results/benchmarking_runtime.txt"
+	prefix := "./artifact/benchmarking/datasets/"
 	postfix := ".txt"
 	format := "millisec"
 	conversion := make(map[string]float64)
