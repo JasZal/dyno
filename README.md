@@ -73,12 +73,12 @@ docker run --rm -v $(pwd)/artifactResults:/claim1Results dyno
 ```
 
 Without Docker:
-navigate in the cloned git and run
+navigate in the cloned git and run install.sh (if not already done) then run
 ```bash
-./run.sh
+./claim1/run.sh
 ```
 
-This will start the benchmarking and log_reg evaluation and will store all results in the folder "artifactResults". 
+This will start the benchmarking and log_reg evaluation and will store all results in the folder "claim1Results". 
 Following a python script will build the figures as displayed in the paper. 
 Runtimes are stored in the respective txt files. 
 Note that the number of rounds over which the average is taken is currently 3 due to efficiency but can be increased in the file 'log_reg/main.go' in Line 60 (resp. 93 for Nhanes) to obtain a more robust result. 
