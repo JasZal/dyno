@@ -84,6 +84,7 @@ Runtimes are stored in the respective txt files.
 Note that the number of rounds over which the average is taken is currently 3 due to efficiency but can be increased in the file 'log_reg/main.go' in Line 60 (resp. 93 for Nhanes) to obtain a more robust result. 
 
 
-
+## License
+This code is licensed under [GPLv3](https://github.com/JasZal/dyno/blob/main/LICENSE.txt)
 
 
