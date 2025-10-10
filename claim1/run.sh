@@ -22,7 +22,7 @@ echo "finished logistic regression training"
 
 
 echo "build figures"
-python3 ../claim1/results/build_plots.py
+python3 ./claim1/results/build_plots.py
 echo "finished everything"
 
 
@@ -41,7 +41,7 @@ FILES=(
 for file in "${FILES[@]}"; do
     src="./claim1/results/$file"
     if [ -f "$src" ]; then
-        cp "$src" ../claim1Results/
+        cp "$src" ./claim1Results/
     fi
 done
 
