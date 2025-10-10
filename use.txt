@@ -1,0 +1,1 @@
+The implementation of Dyno can be used to train a privacy-preserving logistic regression using the protocol as provided in the paper for relatively small datasets. It is not suitable for datasets with a large number of attributes due to the approximation of the sigmoid function by degree 3.
