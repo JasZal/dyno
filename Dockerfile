@@ -20,14 +20,14 @@ ARG REPO_URL=https://github.com/JasZal/dyno.git
 RUN git clone ${REPO_URL} .
 
 # Make run.sh executable
-RUN chmod +x ./claim1/run.sh
+RUN chmod +x ./claim1/dockerRun.sh
 
 # Declare results folder as a volume
 VOLUME ["/app/claim1Results"]
 
 # Run the script either with or without the biggest dataset Nhanes
 # default: run without Nhanes
-CMD ["./run.sh"]
+CMD ["./dockerRun.sh"]
 
 #to include Nhanes change above line to 
-#CMD ["./run.sh --includeNahnes"]
+#CMD ["./dockerRun.sh --includeNahnes"]

@@ -12,21 +12,21 @@ fi
 
 
 echo "start benchmarking DyNo"
-go run ../artifact/benchmarking 
+go run ./artifact/benchmarking 
 echo "finished benchmarking DyNo"
 
 
 echo "start logistic regression training"
-go run ../artifact/log_reg --includeNahnes=$INCLUDE_NAHNES
+#go run ./artifact/log_reg --includeNahnes=$INCLUDE_NAHNES
 echo "finished logistic regression training"
 
 
 echo "build figures"
-python3 ../claim1/results/build_plots.py
+python3 ./claim1/results/build_plots.py
 echo "finished everything"
 
 
-mkdir -p ../claim1Results
+mkdir -p ./claim1Results
 
 # copy files to volume folder
 FILES=(
@@ -39,9 +39,9 @@ FILES=(
 )
 
 for file in "${FILES[@]}"; do
-    src="../claim1/results/$file"
+    src="./claim1/results/$file"
     if [ -f "$src" ]; then
-        cp "$src" ../claim1Results/
+        cp "$src" ./claim1Results/
     fi
 done
 
