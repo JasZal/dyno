@@ -1,1 +1,5 @@
 time in Minutes
+LBW50:  av time: 0.46054396258333336
+PCS50:  av time: 0.5660657400114584
+UIS50:  av time: 0.8085434744527777
+Nhanes50:  av time: 89.50328696461666
