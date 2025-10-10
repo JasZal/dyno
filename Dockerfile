@@ -30,4 +30,4 @@ VOLUME ["/app/claim1Results"]
 CMD ["./claim1/dockerRun.sh"]
 
 #to include Nhanes change above line to 
-#CMD ["./claim1/dockerRun.sh --includeNahnes"]
+#CMD ["./claim1/dockerRun.sh", "--includeNahnes"]
