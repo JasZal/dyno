@@ -69,7 +69,7 @@ Docker:
 navigate in the folder where the dockerfile is and run
 ```bash
 docker build -t dyno .
-docker run --rm -v $(pwd)/artifactResults:/artifactResults dyno
+docker run --rm -v $(pwd)/artifactResults:/claim1Results dyno
 ```
 
 Without Docker:

@@ -27,7 +27,7 @@ VOLUME ["/app/claim1Results"]
 
 # Run the script either with or without the biggest dataset Nhanes
 # default: run without Nhanes
-CMD ["./claim1/run.sh"]
+CMD ["./run.sh"]
 
 #to include Nhanes change above line to 
-#CMD ["./claim1/run.sh --includeNahnes"]
+#CMD ["./run.sh --includeNahnes"]
